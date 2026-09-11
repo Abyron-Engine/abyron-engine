@@ -64,7 +64,8 @@ padding:12px;
 border:0;
 border-radius:9px;
 background:transparent;
-color:#9299a5
+color:#9299a5;
+font-size:15px
 }
 
 .tabs button.active{
@@ -91,6 +92,10 @@ color:#fff;
 outline:none
 }
 
+input:focus,textarea:focus{
+border-color:#7c5cff
+}
+
 .primary{
 width:100%;
 padding:14px;
@@ -98,10 +103,13 @@ border:0;
 border-radius:11px;
 background:#fff;
 color:#08090b;
-font-weight:bold
+font-weight:bold;
+font-size:15px
 }
 
-.primary:disabled{opacity:.5}
+.primary:disabled{
+opacity:.5
+}
 
 .msg{
 display:none;
@@ -143,9 +151,18 @@ padding:9px 14px;
 border-radius:9px
 }
 
-.hero{padding:30px 0 15px}
-.hero h2{margin:0 0 7px;font-size:30px}
-.muted{color:#9299a5}
+.hero{
+padding:30px 0 15px
+}
+
+.hero h2{
+margin:0 0 7px;
+font-size:30px
+}
+
+.muted{
+color:#9299a5
+}
 
 .panel{
 background:#111318;
@@ -155,7 +172,9 @@ padding:18px;
 margin-top:16px
 }
 
-.panel h3{margin-top:0}
+.panel h3{
+margin-top:0
+}
 
 .upload{
 display:flex;
@@ -222,7 +241,9 @@ resize:none;
 flex:1
 }
 
-.ask button{width:110px}
+.ask button{
+width:110px
+}
 
 .note{
 text-align:center;
@@ -241,7 +262,7 @@ color:#9ca3af
 
 <body>
 
-<!-- AUTH -->
+<!-- ================= AUTH ================= -->
 
 <div id="authPage" class="auth">
 
@@ -271,6 +292,7 @@ Create account
 
 <div class="field">
 <label>Email</label>
+
 <input
 id="email"
 type="email"
@@ -281,6 +303,7 @@ placeholder="you@example.com">
 
 <div class="field">
 <label>Password</label>
+
 <input
 id="password"
 type="password"
@@ -290,7 +313,10 @@ autocomplete="current-password"
 placeholder="Minimum 6 characters">
 </div>
 
-<button id="authButton" class="primary" type="submit">
+<button
+id="authButton"
+class="primary"
+type="submit">
 Sign in
 </button>
 
@@ -306,7 +332,7 @@ Secured by Supabase Authentication
 </div>
 
 
-<!-- APP -->
+<!-- ================= APP ================= -->
 
 <div id="appPage" class="hidden">
 
@@ -324,54 +350,73 @@ Sign out
 
 </div>
 
+
 <div class="hero">
 
-<h2>Personal Knowledge Engine</h2>
+<h2>
+Personal Knowledge Engine
+</h2>
 
 <div id="accountEmail" class="muted"></div>
 
 </div>
 
 
-<!-- KNOWLEDGE -->
+<!-- ================= KNOWLEDGE ================= -->
 
 <div class="panel">
 
-<h3>📚 Knowledge Library</h3>
+<h3>
+📚 Knowledge Library
+</h3>
 
 <div class="upload">
 
 <input
 id="fileInput"
 type="file"
-accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.webp,
-application/pdf,text/plain,text/markdown,
-image/jpeg,image/png,image/webp">
+accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.webp,application/pdf,text/plain,text/markdown,image/jpeg,image/png,image/webp">
 
-<button id="uploadButton" class="small">
+<button
+id="uploadButton"
+class="small"
+type="button">
 Upload
 </button>
 
 </div>
 
-<div class="muted" style="margin-top:10px;font-size:12px">
-Supported: PDF • JPG • JPEG • PNG • WEBP • TXT • MD
+<div
+class="muted"
+style="margin-top:10px;font-size:12px">
+
+Supported:
+PDF • JPG • JPEG • PNG • WEBP • TXT • MD
+
 </div>
 
-<div id="uploadProgress" class="progress"></div>
+<div
+id="uploadProgress"
+class="progress">
+</div>
 
-<div id="uploadMessage" class="msg"></div>
+<div
+id="uploadMessage"
+class="msg">
+</div>
 
 <div id="documents"></div>
 
 </div>
 
 
-<!-- AI -->
+<!-- ================= AI ================= -->
 
 <div class="panel">
 
-<h3>🤖 Ask your knowledge</h3>
+<h3>
+🤖 Ask your knowledge
+</h3>
 
 <div id="chat" class="chat">
 
@@ -387,7 +432,9 @@ Upload your documents and ask questions about them.
 id="question"
 placeholder="Ask something about your documents..."></textarea>
 
-<button id="askButton" class="primary">
+<button
+id="askButton"
+class="primary">
 Ask AI
 </button>
 
@@ -401,17 +448,27 @@ Ask AI
 </div>
 
 
-<!-- LIBRARIES -->
+<!-- ================= LIBRARIES ================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-type="module"></script>
+<!-- PDF.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+<script>
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+</script>
+
+<!-- TESSERACT OCR -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 
 <script>
+
+/* ================= SUPABASE ================= */
 
 const SUPABASE_URL =
 "https://ohqrskefwvtlnngqmeqc.supabase.co";
@@ -425,66 +482,75 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
-let authMode="login";
-let currentUser=null;
+
+let authMode = "login";
+let currentUser = null;
 
 
-/* HELPERS */
+/* ================= HELPERS ================= */
 
 function $(id){
+
 return document.getElementById(id);
+
 }
+
 
 function showMessage(element,text,type){
 
-element.textContent=text;
-element.className="msg show "+type;
+element.textContent = text;
+
+element.className =
+"msg show " + type;
 
 }
+
 
 function hideMessage(element){
 
-element.textContent="";
-element.className="msg";
+element.textContent = "";
+
+element.className = "msg";
 
 }
 
 
-/* AUTH MODE */
+/* ================= AUTH MODE ================= */
 
 function setAuthMode(mode){
 
-authMode=mode;
+authMode = mode;
 
 $("loginTab").classList.toggle(
 "active",
-mode==="login"
+mode === "login"
 );
 
 $("signupTab").classList.toggle(
 "active",
-mode==="signup"
+mode === "signup"
 );
 
-if(mode==="login"){
+if(mode === "login"){
 
-$("authButton").textContent="Sign in";
+$("authButton").textContent =
+"Sign in";
 
-$("subtitle").textContent=
+$("subtitle").textContent =
 "Your private knowledge workspace";
 
-$("password").autocomplete=
+$("password").autocomplete =
 "current-password";
 
 }else{
 
-$("authButton").textContent=
+$("authButton").textContent =
 "Create account";
 
-$("subtitle").textContent=
+$("subtitle").textContent =
 "Create your private knowledge workspace";
 
-$("password").autocomplete=
+$("password").autocomplete =
 "new-password";
 
 }
@@ -494,39 +560,39 @@ hideMessage($("authMessage"));
 }
 
 
-$("loginTab").onclick=function(){
+$("loginTab").onclick = function(){
 
 setAuthMode("login");
 
 };
 
 
-$("signupTab").onclick=function(){
+$("signupTab").onclick = function(){
 
 setAuthMode("signup");
 
 };
 
 
-/* SHOW APP */
+/* ================= DASHBOARD ================= */
 
 function showDashboard(user){
 
-currentUser=user;
+currentUser = user;
 
 $("authPage").classList.add("hidden");
 
 $("appPage").classList.remove("hidden");
 
-$("accountEmail").textContent=
-user.email||"Signed in";
+$("accountEmail").textContent =
+user.email || "";
 
 loadDocuments();
 
 }
 
 
-/* AUTH */
+/* ================= AUTH ================= */
 
 $("authForm").addEventListener(
 "submit",
@@ -534,20 +600,22 @@ async function(event){
 
 event.preventDefault();
 
-$("authButton").disabled=true;
+$("authButton").disabled = true;
 
 hideMessage($("authMessage"));
 
 try{
 
-const email=$("email").value.trim();
+const email =
+$("email").value.trim();
 
-const password=$("password").value;
+const password =
+$("password").value;
 
 
-if(authMode==="signup"){
+if(authMode === "signup"){
 
-const result=
+const result =
 await supabaseClient.auth.signUp({
 
 email:email,
@@ -569,7 +637,7 @@ result.data.user
 
 showMessage(
 $("authMessage"),
-"Account created. Check your email and confirm your account, then sign in.",
+"Account created. Check your email, confirm your account, then sign in.",
 "success"
 );
 
@@ -579,7 +647,7 @@ setAuthMode("login");
 
 }else{
 
-const result=
+const result =
 await supabaseClient.auth.signInWithPassword({
 
 email:email,
@@ -609,45 +677,49 @@ result.data.user
 
 showMessage(
 $("authMessage"),
-error.message||
+error.message ||
 "Authentication failed.",
 "error"
 );
 
 }
 
-$("authButton").disabled=false;
+$("authButton").disabled = false;
 
 }
 );
 
 
-/* LOGOUT */
+/* ================= LOGOUT ================= */
 
-$("logoutButton").onclick=
+$("logoutButton").onclick =
 async function(){
 
 await supabaseClient.auth.signOut();
 
-currentUser=null;
+currentUser = null;
 
 $("appPage").classList.add("hidden");
 
 $("authPage").classList.remove("hidden");
+
+$("email").value = "";
+
+$("password").value = "";
 
 setAuthMode("login");
 
 };
 
 
-/* DOCUMENT LIST */
+/* ================= DOCUMENT LIST ================= */
 
 async function loadDocuments(){
 
 if(!currentUser)
 return;
 
-const result=
+const result =
 await supabaseClient
 .from("documents")
 .select("*")
@@ -668,18 +740,19 @@ return;
 
 }
 
-const docs=result.data||[];
+const docs =
+result.data || [];
 
 if(!docs.length){
 
-$("documents").innerHTML=
+$("documents").innerHTML =
 "<div class='muted' style='padding-top:14px'>No documents uploaded yet.</div>";
 
 return;
 
 }
 
-$("documents").innerHTML=
+$("documents").innerHTML =
 docs.map(function(doc){
 
 return `
@@ -692,8 +765,10 @@ return `
 
 <button
 class="small"
-onclick="deleteDocument('${doc.id}','${escapeJS(doc.file_path||"")}')">
+onclick="deleteDocument('${doc.id}','${escapeJS(doc.file_path || "")}')">
+
 Delete
+
 </button>
 
 </div>
@@ -712,11 +787,13 @@ return String(text).replace(
 function(c){
 
 return {
+
 "&":"&amp;",
 "<":"&lt;",
 ">":"&gt;",
 '"':"&quot;",
 "'":"&#39;"
+
 }[c];
 
 }
@@ -734,15 +811,17 @@ return String(text)
 }
 
 
-/* DELETE */
+/* ================= DELETE ================= */
 
-window.deleteDocument=
+window.deleteDocument =
 async function(id,path){
 
-if(!confirm("Delete this document?"))
+if(!confirm(
+"Delete this document?"
+))
 return;
 
-const result=
+const result =
 await supabaseClient
 .from("documents")
 .delete()
@@ -770,28 +849,28 @@ loadDocuments();
 };
 
 
-/* CHUNK */
+/* ================= TEXT CHUNKS ================= */
 
 function createChunks(text){
 
-const size=1400;
+const size = 1400;
 
-const overlap=250;
+const overlap = 250;
 
-const chunks=[];
+const chunks = [];
 
-let position=0;
+let position = 0;
 
-while(position<text.length){
+while(position < text.length){
 
 chunks.push(
 text.substring(
 position,
-position+size
+position + size
 )
 );
 
-position+=size-overlap;
+position += size - overlap;
 
 }
 
@@ -800,14 +879,14 @@ return chunks;
 }
 
 
-/* OCR IMAGE */
+/* ================= IMAGE OCR ================= */
 
 async function imageToText(file){
 
-$("uploadProgress").textContent=
+$("uploadProgress").textContent =
 "🔎 Reading image with OCR...";
 
-const result=
+const result =
 await Tesseract.recognize(
 file,
 "eng+hin",
@@ -816,16 +895,19 @@ file,
 logger:function(info){
 
 if(
-info.status==="recognizing text"
+info.status ===
+"recognizing text"
 ){
 
-const percent=
+const percent =
 Math.round(
-(info.progress||0)*100
+(info.progress || 0) * 100
 );
 
-$("uploadProgress").textContent=
-"🔎 OCR: "+percent+"%";
+$("uploadProgress").textContent =
+"🔎 OCR: " +
+percent +
+"%";
 
 }
 
@@ -834,56 +916,62 @@ $("uploadProgress").textContent=
 }
 );
 
-return result.data.text||"";
+return result.data.text || "";
 
 }
 
 
-/* PDF TEXT */
+/* ================= PDF TEXT ================= */
 
 async function pdfToText(file){
 
-$("uploadProgress").textContent=
-"📖 Reading PDF...";
+$("uploadProgress").textContent =
+"📖 Opening PDF...";
 
-const buffer=
+const buffer =
 await file.arrayBuffer();
 
-const pdf=
-await window.pdfjsLib
+const pdf =
+await pdfjsLib
 .getDocument({
 data:buffer
 })
 .promise;
 
-let fullText="";
+let fullText = "";
 
 for(
-let pageNumber=1;
-pageNumber<=pdf.numPages;
+let pageNumber = 1;
+pageNumber <= pdf.numPages;
 pageNumber++
 ){
 
-$("uploadProgress").textContent=
-"📖 Reading PDF page "+
-pageNumber+
-" / "+
+$("uploadProgress").textContent =
+"📖 Reading PDF page " +
+pageNumber +
+" / " +
 pdf.numPages;
 
-const page=
-await pdf.getPage(pageNumber);
+const page =
+await pdf.getPage(
+pageNumber
+);
 
-const content=
+const content =
 await page.getTextContent();
 
-const pageText=
+const pageText =
 content.items
 .map(function(item){
-return item.str||"";
+
+return item.str || "";
+
 })
 .join(" ");
 
-fullText+=pageText+"\n";
+fullText +=
+pageText +
+"\n";
 
 }
 
@@ -892,12 +980,12 @@ return fullText;
 }
 
 
-/* UPLOAD */
+/* ================= UPLOAD ================= */
 
-$("uploadButton").onclick=
+$("uploadButton").onclick =
 async function(){
 
-const file=
+const file =
 $("fileInput").files[0];
 
 if(!file){
@@ -924,32 +1012,38 @@ return;
 
 }
 
-$("uploadButton").disabled=true;
+$("uploadButton").disabled = true;
 
-hideMessage($("uploadMessage"));
+hideMessage(
+$("uploadMessage")
+);
 
-$("uploadProgress").textContent=
-"Preparing "+file.name+"...";
+$("uploadProgress").textContent =
+"Preparing " +
+file.name +
+"...";
+
 
 try{
 
-let text="";
+let text = "";
 
-const name=
+const name =
 file.name.toLowerCase();
 
 
 /* TXT */
 
 if(
-name.endsWith(".txt")||
+name.endsWith(".txt") ||
 name.endsWith(".md")
 ){
 
-$("uploadProgress").textContent=
+$("uploadProgress").textContent =
 "📝 Reading text file...";
 
-text=await file.text();
+text =
+await file.text();
 
 }
 
@@ -957,13 +1051,14 @@ text=await file.text();
 /* IMAGE */
 
 else if(
-name.endsWith(".jpg")||
-name.endsWith(".jpeg")||
-name.endsWith(".png")||
+name.endsWith(".jpg") ||
+name.endsWith(".jpeg") ||
+name.endsWith(".png") ||
 name.endsWith(".webp")
 ){
 
-text=await imageToText(file);
+text =
+await imageToText(file);
 
 }
 
@@ -974,7 +1069,8 @@ else if(
 name.endsWith(".pdf")
 ){
 
-text=await pdfToText(file);
+text =
+await pdfToText(file);
 
 }
 
@@ -995,7 +1091,7 @@ throw new Error(
 if(!text.trim()){
 
 throw new Error(
-"No readable text found. The image/PDF may need better OCR or contain no readable text."
+"No readable text found in this file."
 );
 
 }
@@ -1003,39 +1099,42 @@ throw new Error(
 
 /* STORAGE */
 
-$("uploadProgress").textContent=
+$("uploadProgress").textContent =
 "☁️ Uploading file...";
 
-const safeName=
+const safeName =
 file.name.replace(
 /[^a-zA-Z0-9._-]/g,
 "_"
 );
 
-const filePath=
-currentUser.id+
-"/"+
-Date.now()+
-"-"+
+const filePath =
+currentUser.id +
+"/" +
+Date.now() +
+"-" +
 safeName;
 
-const storageResult=
+
+const storageResult =
 await supabaseClient
 .storage
 .from("documents")
 .upload(
 filePath,
 file,
-{upsert:false}
+{
+upsert:false
+}
 );
 
 if(storageResult.error)
 throw storageResult.error;
 
 
-/* DOCUMENT */
+/* DOCUMENT RECORD */
 
-const documentResult=
+const documentResult =
 await supabaseClient
 .from("documents")
 .insert({
@@ -1058,31 +1157,36 @@ if(documentResult.error)
 throw documentResult.error;
 
 
-const document=
+const document =
 documentResult.data;
 
 
 /* CHUNKS */
 
-$("uploadProgress").textContent=
+$("uploadProgress").textContent =
 "🧠 Indexing knowledge...";
 
-const chunks=
+const chunks =
 createChunks(text);
 
-const rows=
+
+const rows =
 chunks.map(
 function(content,index){
 
 return {
 
-document_id:document.id,
+document_id:
+document.id,
 
-user_id:currentUser.id,
+user_id:
+currentUser.id,
 
-content:content,
+content:
+content,
 
-chunk_index:index
+chunk_index:
+index
 
 };
 
@@ -1090,7 +1194,9 @@ chunk_index:index
 );
 
 
-const chunkResult=
+/* INSERT CHUNKS */
+
+const chunkResult =
 await supabaseClient
 .from("document_chunks")
 .insert(rows);
@@ -1099,61 +1205,63 @@ if(chunkResult.error)
 throw chunkResult.error;
 
 
-$("uploadProgress").textContent="";
+$("uploadProgress").textContent = "";
 
 showMessage(
 $("uploadMessage"),
-"✅ "+file.name+
+"✅ " +
+file.name +
 " uploaded and indexed successfully.",
 "success"
 );
 
-$("fileInput").value="";
+$("fileInput").value = "";
 
 loadDocuments();
 
 }catch(error){
 
-$("uploadProgress").textContent="";
+$("uploadProgress").textContent = "";
 
 showMessage(
 $("uploadMessage"),
-error.message||
+error.message ||
 "Upload failed.",
 "error"
 );
 
 }
 
-$("uploadButton").disabled=false;
+$("uploadButton").disabled = false;
 
 };
 
 
-/* CHAT */
+/* ================= CHAT ================= */
 
 function addChatMessage(text,type){
 
-const div=
+const div =
 document.createElement("div");
 
-div.className=
-"bubble "+type;
+div.className =
+"bubble " +
+type;
 
-div.textContent=text;
+div.textContent = text;
 
 $("chat").appendChild(div);
 
-$("chat").scrollTop=
+$("chat").scrollTop =
 $("chat").scrollHeight;
 
 }
 
 
-$("askButton").onclick=
+$("askButton").onclick =
 async function(){
 
-const question=
+const question =
 $("question").value.trim();
 
 if(!question)
@@ -1171,20 +1279,22 @@ return;
 
 }
 
-$("askButton").disabled=true;
+$("askButton").disabled = true;
 
-hideMessage($("aiMessage"));
+hideMessage(
+$("aiMessage")
+);
 
 addChatMessage(
 question,
 "user"
 );
 
-$("question").value="";
+$("question").value = "";
 
 try{
 
-const result=
+const result =
 await supabaseClient
 .functions
 .invoke(
@@ -1199,12 +1309,14 @@ question:question
 if(result.error)
 throw result.error;
 
-const answer=
+
+const answer =
 result.data &&
 (
-result.data.answer||
+result.data.answer ||
 result.data.message
 );
+
 
 if(!answer){
 
@@ -1213,6 +1325,7 @@ throw new Error(
 );
 
 }
+
 
 addChatMessage(
 answer,
@@ -1223,24 +1336,26 @@ answer,
 
 showMessage(
 $("aiMessage"),
-error.message||
+error.message ||
 "AI request failed.",
 "error"
 );
 
 }
 
-$("askButton").disabled=false;
+$("askButton").disabled = false;
 
 };
 
 
-/* RESTORE SESSION */
+/* ================= RESTORE SESSION ================= */
 
 (async function(){
 
-const result=
-await supabaseClient.auth.getSession();
+const result =
+await supabaseClient
+.auth
+.getSession();
 
 if(
 result.data &&
@@ -1256,14 +1371,16 @@ result.data.session.user
 })();
 
 
-/* AUTH STATE */
+/* ================= AUTH STATE ================= */
 
-supabaseClient.auth.onAuthStateChange(
+supabaseClient
+.auth
+.onAuthStateChange(
 function(event,session){
 
 if(
 session &&
-event==="SIGNED_IN"
+event === "SIGNED_IN"
 ){
 
 showDashboard(
