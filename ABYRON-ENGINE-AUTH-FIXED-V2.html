@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abyron Engine — Account</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#08090b;color:#f5f7fa;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;padding:20px}
+.card{width:min(430px,100%);background:#111318;border:1px solid #252a33;border-radius:22px;padding:26px;box-shadow:0 24px 80px #0008}
+.logo{width:54px;height:54px;margin:0 auto 14px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:grid;place-items:center;font-size:23px;font-weight:900}
+h1{text-align:center;margin:0 0 5px}.sub{text-align:center;color:#8f96a2;font-size:14px}
+.tabs{display:flex;gap:4px;background:#0a0c0f;padding:4px;border-radius:11px;margin:23px 0}
+.tabs button{flex:1;border:0;background:transparent;color:#9298a4;padding:11px;border-radius:8px;cursor:pointer;font-weight:650}
+.tabs button.active{background:#20242c;color:#fff}
+.field{margin:0 0 16px}label{display:block;color:#b8bdc7;font-size:13px;margin-bottom:7px}
+input{width:100%;padding:14px;border:1px solid #2b3039;border-radius:11px;background:#0b0d10;color:#fff;font-size:15px;outline:none}
+input:focus{border-color:#7c5cff}
+.submit{width:100%;padding:14px;border:0;border-radius:11px;background:#fff;color:#08090b;font-weight:750;cursor:pointer}
+.submit:disabled{opacity:.55}
+.msg{display:none;margin-top:14px;padding:12px;border-radius:10px;font-size:13px;line-height:1.45}.msg.show{display:block}.error{background:#35171b;color:#ffb7bd}.success{background:#123021;color:#b9f5d0}
+.note{text-align:center;color:#737b87;font-size:12px;margin-top:18px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">A</div>
+  <h1>Abyron Engine</h1>
+  <div class="sub" id="subtitle">Sign in to your private knowledge workspace</div>
+
+  <div class="tabs">
+    <button type="button" id="signInTab" class="active">Sign in</button>
+    <button type="button" id="createTab">Create account</button>
+  </div>
+
+  <form id="form">
+    <div class="field">
+      <label>Email</label>
+      <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="password" type="password" minlength="6" autocomplete="current-password" required placeholder="Minimum 6 characters">
+    </div>
+    <button class="submit" id="submit" type="submit">Sign in</button>
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <div class="note">Your account is secured by Supabase Authentication.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://ohqrskefwvtlnngqmeqc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_aZiOzYpaik529lLoa_-C5Q_TKjs4iPk";
+
+let client = null;
+let mode = "login";
+
+function $(id){ return document.getElementById(id); }
+
+function showMode(newMode){
+  mode = newMode;
+  $("signInTab").classList.toggle("active", mode === "login");
+  $("createTab").classList.toggle("active", mode === "signup");
+  $("submit").textContent = mode === "login" ? "Sign in" : "Create account";
+  $("subtitle").textContent = mode === "login"
+    ? "Sign in to your private knowledge workspace"
+    : "Create your private knowledge workspace";
+  $("password").autocomplete = mode === "login" ? "current-password" : "new-password";
+  $("msg").className = "msg";
+  $("msg").textContent = "";
+}
+
+$("signInTab").addEventListener("click", function(){ showMode("login"); });
+$("createTab").addEventListener("click", function(){ showMode("signup"); });
+
+function showMessage(text, type){
+  $("msg").textContent = text;
+  $("msg").className = "msg show " + type;
+}
+
+function getClient(){
+  if(!client){
+    if(!window.supabase || !window.supabase.createClient){
+      throw new Error("Supabase library could not load. Check your internet connection and reopen the file.");
+    }
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  return client;
+}
+
+$("form").addEventListener("submit", async function(e){
+  e.preventDefault();
+  $("submit").disabled = true;
+  $("msg").className = "msg";
+
+  try{
+    const sb = getClient();
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    if(mode === "signup"){
+      const {data,error} = await sb.auth.signUp({email,password});
+      if(error) throw error;
+
+      if(data.session){
+        showMessage("Account created. You are signed in.", "success");
+        setTimeout(function(){ location.href = "ABYRON-ENGINE-V2.html"; }, 600);
+      }else{
+        showMessage("Account created. Check your email and confirm your account, then sign in.", "success");
+        $("form").reset();
+        showMode("login");
+      }
+    }else{
+      const {data,error} = await sb.auth.signInWithPassword({email,password});
+      if(error) throw error;
+
+      showMessage("Signed in successfully. Opening your workspace…", "success");
+      setTimeout(function(){ location.href = "ABYRON-ENGINE-V2.html"; }, 500);
+    }
+  }catch(err){
+    showMessage(err.message || "Something went wrong.", "error");
+  }finally{
+    $("submit").disabled = false;
+  }
+});
+</script>
+</body>
+</html>
