@@ -11,8 +11,7 @@ body{
 margin:0;
 background:#08090b;
 color:#fff;
-font-family:Arial,system-ui,sans-serif;
-min-height:100vh
+font-family:Arial,system-ui,sans-serif
 }
 .hidden{display:none!important}
 
@@ -23,6 +22,7 @@ align-items:center;
 justify-content:center;
 padding:20px
 }
+
 .card{
 width:100%;
 max-width:430px;
@@ -32,6 +32,7 @@ border-radius:24px;
 padding:28px;
 box-shadow:0 20px 70px #0009
 }
+
 .logo{
 width:60px;
 height:60px;
@@ -44,6 +45,7 @@ font-size:28px;
 font-weight:bold;
 background:linear-gradient(135deg,#8b5cf6,#22d3ee)
 }
+
 h1{text-align:center;margin:0 0 7px}
 .subtitle{text-align:center;color:#9299a5}
 
@@ -55,19 +57,22 @@ padding:4px;
 border-radius:12px;
 margin:24px 0
 }
+
 .tabs button{
 flex:1;
 padding:12px;
 border:0;
 border-radius:9px;
 background:transparent;
-color:#9299a5;
-font-size:15px
+color:#9299a5
 }
+
 .tabs button.active{
 background:#22262e;
 color:#fff
 }
+
+.field{margin-bottom:16px}
 
 label{
 display:block;
@@ -75,6 +80,7 @@ font-size:13px;
 color:#b9bec8;
 margin-bottom:7px
 }
+
 input,textarea{
 width:100%;
 padding:14px;
@@ -84,7 +90,6 @@ background:#0b0d10;
 color:#fff;
 outline:none
 }
-.field{margin-bottom:16px}
 
 .primary{
 width:100%;
@@ -93,9 +98,9 @@ border:0;
 border-radius:11px;
 background:#fff;
 color:#08090b;
-font-weight:bold;
-font-size:15px
+font-weight:bold
 }
+
 .primary:disabled{opacity:.5}
 
 .msg{
@@ -106,6 +111,7 @@ border-radius:10px;
 font-size:13px;
 line-height:1.5
 }
+
 .msg.show{display:block}
 .error{background:#35171b;color:#ffb8bf}
 .success{background:#123021;color:#baf4d0}
@@ -115,6 +121,7 @@ max-width:950px;
 margin:auto;
 padding:18px
 }
+
 .top{
 display:flex;
 justify-content:space-between;
@@ -122,10 +129,12 @@ align-items:center;
 padding:15px 0;
 border-bottom:1px solid #242932
 }
+
 .brand{
 font-size:21px;
 font-weight:bold
 }
+
 .logout{
 background:#15181d;
 border:1px solid #303640;
@@ -145,6 +154,7 @@ border-radius:18px;
 padding:18px;
 margin-top:16px
 }
+
 .panel h3{margin-top:0}
 
 .upload{
@@ -152,11 +162,13 @@ display:flex;
 gap:10px;
 flex-wrap:wrap
 }
+
 .upload input{
 flex:1;
 min-width:180px;
 padding:10px
 }
+
 .small{
 padding:10px 14px;
 border:1px solid #303640;
@@ -180,6 +192,7 @@ max-height:400px;
 overflow:auto;
 margin-bottom:12px
 }
+
 .bubble{
 padding:12px;
 border-radius:12px;
@@ -187,10 +200,12 @@ margin:9px 0;
 line-height:1.5;
 white-space:pre-wrap
 }
+
 .user{
 background:#20252d;
 margin-left:15%
 }
+
 .ai{
 background:#15191f;
 margin-right:15%
@@ -200,11 +215,13 @@ margin-right:15%
 display:flex;
 gap:9px
 }
+
 .ask textarea{
 min-height:48px;
 resize:none;
 flex:1
 }
+
 .ask button{width:110px}
 
 .note{
@@ -213,12 +230,18 @@ font-size:12px;
 color:#737b87;
 margin-top:16px
 }
+
+.progress{
+margin-top:12px;
+font-size:13px;
+color:#9ca3af
+}
 </style>
 </head>
 
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- AUTH -->
 
 <div id="authPage" class="auth">
 
@@ -283,7 +306,7 @@ Secured by Supabase Authentication
 </div>
 
 
-<!-- ================= DASHBOARD ================= -->
+<!-- APP -->
 
 <div id="appPage" class="hidden">
 
@@ -303,9 +326,7 @@ Sign out
 
 <div class="hero">
 
-<h2>
-Personal Knowledge Engine
-</h2>
+<h2>Personal Knowledge Engine</h2>
 
 <div id="accountEmail" class="muted"></div>
 
@@ -316,20 +337,28 @@ Personal Knowledge Engine
 
 <div class="panel">
 
-<h3>📚 Knowledge</h3>
+<h3>📚 Knowledge Library</h3>
 
 <div class="upload">
 
 <input
 id="fileInput"
 type="file"
-accept=".txt,.md,.pdf">
+accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.webp,
+application/pdf,text/plain,text/markdown,
+image/jpeg,image/png,image/webp">
 
 <button id="uploadButton" class="small">
 Upload
 </button>
 
 </div>
+
+<div class="muted" style="margin-top:10px;font-size:12px">
+Supported: PDF • JPG • JPEG • PNG • WEBP • TXT • MD
+</div>
+
+<div id="uploadProgress" class="progress"></div>
 
 <div id="uploadMessage" class="msg"></div>
 
@@ -347,7 +376,7 @@ Upload
 <div id="chat" class="chat">
 
 <div class="muted">
-Upload your notes or documents and then ask questions.
+Upload your documents and ask questions about them.
 </div>
 
 </div>
@@ -369,11 +398,18 @@ Ask AI
 </div>
 
 </div>
-
 </div>
 
 
+<!-- LIBRARIES -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
+type="module"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 
 <script>
 
@@ -389,12 +425,11 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
+let authMode="login";
+let currentUser=null;
 
-let authMode = "login";
-let currentUser = null;
 
-
-/* ================= HELPERS ================= */
+/* HELPERS */
 
 function $(id){
 return document.getElementById(id);
@@ -402,54 +437,54 @@ return document.getElementById(id);
 
 function showMessage(element,text,type){
 
-element.textContent = text;
-element.className = "msg show " + type;
+element.textContent=text;
+element.className="msg show "+type;
 
 }
 
 function hideMessage(element){
 
-element.textContent = "";
-element.className = "msg";
+element.textContent="";
+element.className="msg";
 
 }
 
 
-/* ================= AUTH MODE ================= */
+/* AUTH MODE */
 
 function setAuthMode(mode){
 
-authMode = mode;
+authMode=mode;
 
 $("loginTab").classList.toggle(
 "active",
-mode === "login"
+mode==="login"
 );
 
 $("signupTab").classList.toggle(
 "active",
-mode === "signup"
+mode==="signup"
 );
 
-if(mode === "login"){
+if(mode==="login"){
 
-$("authButton").textContent = "Sign in";
+$("authButton").textContent="Sign in";
 
-$("subtitle").textContent =
+$("subtitle").textContent=
 "Your private knowledge workspace";
 
-$("password").autocomplete =
+$("password").autocomplete=
 "current-password";
 
 }else{
 
-$("authButton").textContent =
+$("authButton").textContent=
 "Create account";
 
-$("subtitle").textContent =
+$("subtitle").textContent=
 "Create your private knowledge workspace";
 
-$("password").autocomplete =
+$("password").autocomplete=
 "new-password";
 
 }
@@ -459,39 +494,39 @@ hideMessage($("authMessage"));
 }
 
 
-$("loginTab").onclick = function(){
+$("loginTab").onclick=function(){
 
 setAuthMode("login");
 
 };
 
 
-$("signupTab").onclick = function(){
+$("signupTab").onclick=function(){
 
 setAuthMode("signup");
 
 };
 
 
-/* ================= SHOW DASHBOARD ================= */
+/* SHOW APP */
 
 function showDashboard(user){
 
-currentUser = user;
+currentUser=user;
 
 $("authPage").classList.add("hidden");
 
 $("appPage").classList.remove("hidden");
 
-$("accountEmail").textContent =
-user.email || "";
+$("accountEmail").textContent=
+user.email||"Signed in";
 
 loadDocuments();
 
 }
 
 
-/* ================= AUTH FORM ================= */
+/* AUTH */
 
 $("authForm").addEventListener(
 "submit",
@@ -499,34 +534,30 @@ async function(event){
 
 event.preventDefault();
 
-$("authButton").disabled = true;
+$("authButton").disabled=true;
 
 hideMessage($("authMessage"));
 
 try{
 
-const email =
-$("email").value.trim();
+const email=$("email").value.trim();
 
-const password =
-$("password").value;
+const password=$("password").value;
 
 
-if(authMode === "signup"){
+if(authMode==="signup"){
 
-const result =
+const result=
 await supabaseClient.auth.signUp({
 
-email: email,
+email:email,
 
-password: password
+password:password
 
 });
 
-
 if(result.error)
 throw result.error;
-
 
 if(result.data.session){
 
@@ -538,7 +569,7 @@ result.data.user
 
 showMessage(
 $("authMessage"),
-"Account created successfully. Please check your email, confirm your account, then sign in.",
+"Account created. Check your email and confirm your account, then sign in.",
 "success"
 );
 
@@ -548,33 +579,29 @@ setAuthMode("login");
 
 }else{
 
-const result =
+const result=
 await supabaseClient.auth.signInWithPassword({
 
-email: email,
+email:email,
 
-password: password
+password:password
 
 });
-
 
 if(result.error)
 throw result.error;
 
+if(!result.data.session){
 
-if(result.data.session){
+throw new Error(
+"No login session was returned."
+);
+
+}
 
 showDashboard(
 result.data.user
 );
-
-}else{
-
-throw new Error(
-"Login succeeded but no session was returned."
-);
-
-}
 
 }
 
@@ -582,48 +609,45 @@ throw new Error(
 
 showMessage(
 $("authMessage"),
-error.message || "Authentication failed.",
+error.message||
+"Authentication failed.",
 "error"
 );
 
 }
 
-$("authButton").disabled = false;
+$("authButton").disabled=false;
 
 }
 );
 
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 
-$("logoutButton").onclick =
+$("logoutButton").onclick=
 async function(){
 
 await supabaseClient.auth.signOut();
 
-currentUser = null;
+currentUser=null;
 
 $("appPage").classList.add("hidden");
 
 $("authPage").classList.remove("hidden");
-
-$("email").value = "";
-
-$("password").value = "";
 
 setAuthMode("login");
 
 };
 
 
-/* ================= DOCUMENTS ================= */
+/* DOCUMENT LIST */
 
 async function loadDocuments(){
 
 if(!currentUser)
 return;
 
-const result =
+const result=
 await supabaseClient
 .from("documents")
 .select("*")
@@ -644,32 +668,36 @@ return;
 
 }
 
-const docs = result.data || [];
+const docs=result.data||[];
 
-if(docs.length === 0){
+if(!docs.length){
 
-$("documents").innerHTML =
+$("documents").innerHTML=
 "<div class='muted' style='padding-top:14px'>No documents uploaded yet.</div>";
 
 return;
 
 }
 
-$("documents").innerHTML =
+$("documents").innerHTML=
 docs.map(function(doc){
 
 return `
+
 <div class="file">
 
-<span>📄 ${escapeHTML(doc.name)}</span>
+<span>
+📄 ${escapeHTML(doc.name)}
+</span>
 
 <button
 class="small"
-onclick="deleteDocument('${doc.id}','${escapeJS(doc.file_path || "")}')">
+onclick="deleteDocument('${doc.id}','${escapeJS(doc.file_path||"")}')">
 Delete
 </button>
 
 </div>
+
 `;
 
 }).join("");
@@ -681,17 +709,15 @@ function escapeHTML(text){
 
 return String(text).replace(
 /[&<>"']/g,
-function(char){
+function(c){
 
 return {
-
 "&":"&amp;",
 "<":"&lt;",
 ">":"&gt;",
 '"':"&quot;",
 "'":"&#39;"
-
-}[char];
+}[c];
 
 }
 );
@@ -708,15 +734,15 @@ return String(text)
 }
 
 
-/* ================= DELETE ================= */
+/* DELETE */
 
-window.deleteDocument =
+window.deleteDocument=
 async function(id,path){
 
 if(!confirm("Delete this document?"))
 return;
 
-const result =
+const result=
 await supabaseClient
 .from("documents")
 .delete()
@@ -744,28 +770,28 @@ loadDocuments();
 };
 
 
-/* ================= TEXT CHUNKING ================= */
+/* CHUNK */
 
 function createChunks(text){
 
-const chunks = [];
+const size=1400;
 
-const size = 1400;
+const overlap=250;
 
-const overlap = 250;
+const chunks=[];
 
-let position = 0;
+let position=0;
 
-while(position < text.length){
+while(position<text.length){
 
 chunks.push(
 text.substring(
 position,
-position + size
+position+size
 )
 );
 
-position += size - overlap;
+position+=size-overlap;
 
 }
 
@@ -774,19 +800,111 @@ return chunks;
 }
 
 
-/* ================= UPLOAD ================= */
+/* OCR IMAGE */
 
-$("uploadButton").onclick =
+async function imageToText(file){
+
+$("uploadProgress").textContent=
+"🔎 Reading image with OCR...";
+
+const result=
+await Tesseract.recognize(
+file,
+"eng+hin",
+{
+
+logger:function(info){
+
+if(
+info.status==="recognizing text"
+){
+
+const percent=
+Math.round(
+(info.progress||0)*100
+);
+
+$("uploadProgress").textContent=
+"🔎 OCR: "+percent+"%";
+
+}
+
+}
+
+}
+);
+
+return result.data.text||"";
+
+}
+
+
+/* PDF TEXT */
+
+async function pdfToText(file){
+
+$("uploadProgress").textContent=
+"📖 Reading PDF...";
+
+const buffer=
+await file.arrayBuffer();
+
+const pdf=
+await window.pdfjsLib
+.getDocument({
+data:buffer
+})
+.promise;
+
+let fullText="";
+
+for(
+let pageNumber=1;
+pageNumber<=pdf.numPages;
+pageNumber++
+){
+
+$("uploadProgress").textContent=
+"📖 Reading PDF page "+
+pageNumber+
+" / "+
+pdf.numPages;
+
+const page=
+await pdf.getPage(pageNumber);
+
+const content=
+await page.getTextContent();
+
+const pageText=
+content.items
+.map(function(item){
+return item.str||"";
+})
+.join(" ");
+
+fullText+=pageText+"\n";
+
+}
+
+return fullText;
+
+}
+
+
+/* UPLOAD */
+
+$("uploadButton").onclick=
 async function(){
 
-const file =
+const file=
 $("fileInput").files[0];
 
 if(!file){
 
 showMessage(
 $("uploadMessage"),
-"Please select a PDF, TXT or MD file first.",
+"Please select a file first.",
 "error"
 );
 
@@ -806,23 +924,46 @@ return;
 
 }
 
-$("uploadButton").disabled = true;
+$("uploadButton").disabled=true;
 
 hideMessage($("uploadMessage"));
 
+$("uploadProgress").textContent=
+"Preparing "+file.name+"...";
+
 try{
 
-let text = "";
+let text="";
+
+const name=
+file.name.toLowerCase();
 
 
-/* TXT / MD */
+/* TXT */
 
 if(
-file.name.toLowerCase().endsWith(".txt") ||
-file.name.toLowerCase().endsWith(".md")
+name.endsWith(".txt")||
+name.endsWith(".md")
 ){
 
-text = await file.text();
+$("uploadProgress").textContent=
+"📝 Reading text file...";
+
+text=await file.text();
+
+}
+
+
+/* IMAGE */
+
+else if(
+name.endsWith(".jpg")||
+name.endsWith(".jpeg")||
+name.endsWith(".png")||
+name.endsWith(".webp")
+){
+
+text=await imageToText(file);
 
 }
 
@@ -830,58 +971,55 @@ text = await file.text();
 /* PDF */
 
 else if(
-file.name.toLowerCase().endsWith(".pdf")
+name.endsWith(".pdf")
 ){
 
-showMessage(
-$("uploadMessage"),
-"PDF detected. PDF text extraction will be added next.",
-"error"
-);
-
-$("uploadButton").disabled = false;
-
-return;
+text=await pdfToText(file);
 
 }
+
+
+/* UNKNOWN */
 
 else{
 
 throw new Error(
-"Only PDF, TXT and MD files are supported."
+"Unsupported file type."
 );
 
 }
 
+
+/* EMPTY */
 
 if(!text.trim()){
 
 throw new Error(
-"No readable text found in this file."
+"No readable text found. The image/PDF may need better OCR or contain no readable text."
 );
 
 }
 
 
-/* STORAGE PATH */
+/* STORAGE */
 
-const safeName =
+$("uploadProgress").textContent=
+"☁️ Uploading file...";
+
+const safeName=
 file.name.replace(
 /[^a-zA-Z0-9._-]/g,
 "_"
 );
 
-const filePath =
-currentUser.id +
-"/" +
-Date.now() +
-"-" +
+const filePath=
+currentUser.id+
+"/"+
+Date.now()+
+"-"+
 safeName;
 
-
-/* STORAGE UPLOAD */
-
-const upload =
+const storageResult=
 await supabaseClient
 .storage
 .from("documents")
@@ -891,13 +1029,13 @@ file,
 {upsert:false}
 );
 
-if(upload.error)
-throw upload.error;
+if(storageResult.error)
+throw storageResult.error;
 
 
-/* DOCUMENT RECORD */
+/* DOCUMENT */
 
-const documentInsert =
+const documentResult=
 await supabaseClient
 .from("documents")
 .insert({
@@ -916,20 +1054,23 @@ file_size:file.size
 .select()
 .single();
 
-if(documentInsert.error)
-throw documentInsert.error;
+if(documentResult.error)
+throw documentResult.error;
 
 
-const document =
-documentInsert.data;
+const document=
+documentResult.data;
 
 
 /* CHUNKS */
 
-const chunks =
+$("uploadProgress").textContent=
+"🧠 Indexing knowledge...";
+
+const chunks=
 createChunks(text);
 
-const rows =
+const rows=
 chunks.map(
 function(content,index){
 
@@ -949,66 +1090,70 @@ chunk_index:index
 );
 
 
-/* INSERT CHUNKS */
-
-const chunkInsert =
+const chunkResult=
 await supabaseClient
 .from("document_chunks")
 .insert(rows);
 
-if(chunkInsert.error)
-throw chunkInsert.error;
+if(chunkResult.error)
+throw chunkResult.error;
 
+
+$("uploadProgress").textContent="";
 
 showMessage(
 $("uploadMessage"),
-"Document uploaded and indexed successfully.",
+"✅ "+file.name+
+" uploaded and indexed successfully.",
 "success"
 );
 
-$("fileInput").value = "";
+$("fileInput").value="";
 
 loadDocuments();
 
 }catch(error){
 
+$("uploadProgress").textContent="";
+
 showMessage(
 $("uploadMessage"),
-error.message || "Upload failed.",
+error.message||
+"Upload failed.",
 "error"
 );
 
 }
 
-$("uploadButton").disabled = false;
+$("uploadButton").disabled=false;
 
 };
 
 
-/* ================= AI CHAT ================= */
+/* CHAT */
 
 function addChatMessage(text,type){
 
-const div =
+const div=
 document.createElement("div");
 
-div.className =
-"bubble " + type;
+div.className=
+"bubble "+type;
 
-div.textContent = text;
+div.textContent=text;
 
 $("chat").appendChild(div);
 
-$("chat").scrollTop =
+$("chat").scrollTop=
 $("chat").scrollHeight;
 
 }
 
 
-$("askButton").onclick =
+$("askButton").onclick=
 async function(){
 
-const question =
+const question=
 $("question").value.trim();
 
 if(!question)
@@ -1026,7 +1171,7 @@ return;
 
 }
 
-$("askButton").disabled = true;
+$("askButton").disabled=true;
 
 hideMessage($("aiMessage"));
 
@@ -1035,11 +1180,11 @@ question,
 "user"
 );
 
-$("question").value = "";
+$("question").value="";
 
 try{
 
-const result =
+const result=
 await supabaseClient
 .functions
 .invoke(
@@ -1054,10 +1199,10 @@ question:question
 if(result.error)
 throw result.error;
 
-const answer =
+const answer=
 result.data &&
 (
-result.data.answer ||
+result.data.answer||
 result.data.message
 );
 
@@ -1078,22 +1223,23 @@ answer,
 
 showMessage(
 $("aiMessage"),
-error.message || "AI request failed.",
+error.message||
+"AI request failed.",
 "error"
 );
 
 }
 
-$("askButton").disabled = false;
+$("askButton").disabled=false;
 
 };
 
 
-/* ================= SESSION CHECK ================= */
+/* RESTORE SESSION */
 
 (async function(){
 
-const result =
+const result=
 await supabaseClient.auth.getSession();
 
 if(
@@ -1110,14 +1256,14 @@ result.data.session.user
 })();
 
 
-/* ================= AUTH STATE ================= */
+/* AUTH STATE */
 
 supabaseClient.auth.onAuthStateChange(
 function(event,session){
 
 if(
 session &&
-event === "SIGNED_IN"
+event==="SIGNED_IN"
 ){
 
 showDashboard(
