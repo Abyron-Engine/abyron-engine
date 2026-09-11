@@ -883,43 +883,76 @@ return chunks;
 
 async function imageToText(file){
 
-$("uploadProgress").textContent =
-"🔎 Reading image with OCR...";
+    $("uploadProgress").textContent =
+        "🔎 Starting OCR...";
 
-const result =
-await Tesseract.recognize(
-file,
-"eng+hin",
-{
+    let worker = null;
 
-logger:function(info){
+    try {
 
-if(
-info.status ===
-"recognizing text"
-){
+        worker = await Tesseract.createWorker("eng", 1, {
 
-const percent =
-Math.round(
-(info.progress || 0) * 100
-);
+            workerPath:
+            "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
 
-$("uploadProgress").textContent =
-"🔎 OCR: " +
-percent +
-"%";
+            corePath:
+            "https://cdn.jsdelivr.net/npm/tesseract.js-core@5.0.0/tesseract-core.wasm.js",
 
+            langPath:
+            "https://tessdata.projectnaptha.com/4.0.0",
+
+            logger: function(info){
+
+                if(info.status === "recognizing text"){
+
+                    const percent =
+                    Math.round(
+                        (info.progress || 0) * 100
+                    );
+
+                    $("uploadProgress").textContent =
+                        "🔎 OCR: " + percent + "%";
+
+                }else if(info.status){
+
+                    $("uploadProgress").textContent =
+                        "🔎 " + info.status + "...";
+                }
+
+            }
+
+        });
+
+        const result =
+        await worker.recognize(file);
+
+        const text =
+        result &&
+        result.data &&
+        result.data.text
+        ? result.data.text
+        : "";
+
+        await worker.terminate();
+
+        return text;
+
+    } catch(error){
+
+        if(worker){
+
+            try{
+                await worker.terminate();
+            }catch(e){}
+
+        }
+
+        throw new Error(
+            "Image OCR failed: " +
+            (error.message || error)
+        );
+    }
 }
-
-}
-
-}
-);
-
-return result.data.text || "";
-
-}
-
 
 /* ================= PDF TEXT ================= */
 
