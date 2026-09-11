@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abyron Engine</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#08090b;color:#f5f7fa;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input{font:inherit}.hidden{display:none!important}
+.auth{min-height:100vh;display:grid;place-items:center;padding:22px}.authcard{width:min(430px,100%);background:#111318;border:1px solid #252a33;border-radius:22px;padding:26px;box-shadow:0 24px 80px #0008}.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:grid;place-items:center;font-weight:900;font-size:22px;margin:0 auto 14px}.title{text-align:center}.title h1{margin:0 0 5px}.muted{color:#8f96a2}.tabs{display:flex;background:#0a0c0f;padding:4px;border-radius:11px;margin:22px 0}.tabs button{flex:1;background:none;border:0;color:#8f96a2;padding:10px;border-radius:8px;cursor:pointer}.tabs button.active{background:#20242c;color:#fff}label{display:block;font-size:13px;color:#b8bdc7;margin:0 0 7px}.field{margin-bottom:16px}input{width:100%;padding:13px 14px;background:#0b0d10;color:#fff;border:1px solid #2b3039;border-radius:11px;outline:none}input:focus{border-color:#7c5cff}.primary,.btn{border-radius:11px;padding:12px 15px;cursor:pointer}.primary{width:100%;border:0;background:#fff;color:#08090b;font-weight:750}.btn{border:1px solid #303640;background:#15181d;color:#fff}.msg{margin-top:13px;padding:11px;border-radius:10px;font-size:13px}.err{background:#35171b;color:#ffb7bd}.ok{background:#123021;color:#b9f5d0}
+.app{min-height:100vh;display:grid;grid-template-columns:260px 1fr}.side{border-right:1px solid #22262d;background:#0c0e11;padding:18px;display:flex;flex-direction:column}.brand{font-size:19px;font-weight:800;margin:5px 4px 25px}.brand span{color:#8b7cff}.nav button{display:block;width:100%;border:0;background:transparent;color:#aeb4bf;text-align:left;padding:12px;border-radius:10px;margin:2px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#191c22;color:#fff}.profile{margin-top:auto;border:1px solid #252a32;border-radius:12px;padding:12px;font-size:12px;color:#8f96a2;word-break:break-all}
+.main{padding:28px;max-width:1120px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:22px}.top h1{margin:0;font-size:28px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{background:#101216;border:1px solid #242932;border-radius:16px;padding:18px}.stat{font-size:28px;font-weight:800;margin-top:7px}
+.upload{border:1px dashed #39404b;border-radius:16px;padding:26px;text-align:center;background:#0d0f13}.upload input{display:none}.drop{cursor:pointer}.docs{display:grid;gap:10px;margin-top:12px}.doc{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #242932;border-radius:12px;padding:13px;background:#101216}.docname{font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.docmeta{font-size:12px;color:#818894;margin-top:4px}
+.chat{height:calc(100vh - 140px);min-height:500px;display:flex;flex-direction:column}.messages{flex:1;overflow:auto;padding:4px 2px}.bubble{max-width:80%;padding:12px 14px;border-radius:14px;margin:10px 0;white-space:pre-wrap;line-height:1.5}.bubble.user{margin-left:auto;background:#e9ebef;color:#090a0c}.bubble.ai{background:#15181e;border:1px solid #292e37}.composer{display:flex;gap:9px;border-top:1px solid #22262d;padding-top:13px}.composer input{flex:1}
+@media(max-width:760px){.app{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:5;border-right:0;border-bottom:1px solid #22262d;padding:10px;flex-direction:row;align-items:center}.brand{margin:0 10px 0 0}.nav{display:flex;gap:3px;flex:1}.nav button{text-align:center;padding:9px}.profile{display:none}.main{padding:18px}.grid{grid-template-columns:1fr}.chat{height:calc(100vh - 165px)}}
+</style>
+</head>
+<body>
+<div id="auth" class="auth">
+<div class="authcard">
+<div class="logo">A</div><div class="title"><h1>Abyron Engine</h1><div class="muted">Your private knowledge workspace</div></div>
+<div class="tabs"><button id="lt" class="active">Sign in</button><button id="st">Create account</button></div>
+<form id="authForm">
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" required></div>
+<div class="field"><label>Password</label><input id="password" type="password" minlength="6" autocomplete="current-password" required></div>
+<button id="authBtn" class="primary">Sign in</button><div id="authMsg" class="hidden"></div>
+</form>
+</div></div>
+
+<div id="app" class="app hidden">
+<aside class="side">
+<div class="brand">Abyron <span>Engine</span></div>
+<div class="nav"><button id="homeNav" class="active">⌂ Home</button><button id="docsNav">▣ Knowledge</button><button id="chatNav">✦ Ask AI</button></div>
+<div class="profile"><div id="profileEmail"></div><button id="logout" class="btn" style="width:100%;margin-top:10px">Sign out</button></div>
+</aside>
+<main class="main">
+<section id="home">
+<div class="top"><div><h1>Your Knowledge Engine</h1><div class="muted">Private documents, searchable knowledge and AI.</div></div><button id="addKnowledge" class="btn primary" style="width:auto">Add knowledge</button></div>
+<div class="grid"><div class="card"><div class="muted">Documents</div><div id="docCount" class="stat">0</div></div><div class="card"><div class="muted">Knowledge chunks</div><div id="chunkCount" class="stat">0</div></div><div class="card"><div class="muted">Account</div><div class="stat" style="font-size:18px">Private</div></div></div>
+<div class="card" style="margin-top:15px"><b>Start here</b><p class="muted">Upload your study notes, PDFs or text files in Knowledge. Then open Ask AI and ask questions about your material.</p></div>
+</section>
+
+<section id="docs" class="hidden">
+<div class="top"><div><h1>Knowledge</h1><div class="muted">Your documents are stored privately under your account.</div></div></div>
+<div class="upload"><label class="drop" for="fileInput"><div style="font-size:30px">＋</div><b>Choose PDF, TXT or Markdown</b><div class="muted" style="margin-top:6px">PDF text is extracted in your browser before storage.</div></label><input id="fileInput" type="file" accept=".pdf,.txt,.md,application/pdf,text/plain"><div id="uploadStatus" class="muted" style="margin-top:12px"></div></div>
+<div style="margin-top:18px"><h2 style="font-size:17px">Your documents</h2><div id="docsList" class="docs"></div></div>
+</section>
+
+<section id="chat" class="hidden chat">
+<div class="top"><div><h1>Ask AI</h1><div class="muted">Ask questions about your private knowledge.</div></div></div>
+<div id="messages" class="messages"><div class="muted" style="text-align:center;padding:30px">Upload a document, then ask a question.</div></div>
+<form id="chatForm" class="composer"><input id="question" placeholder="Ask about your documents…" autocomplete="off"><button class="btn primary" style="width:auto">Ask</button></form>
+</section>
+</main></div>
+
+<script>
+const URL="https://ohqrskefwvtlnngqmeqc.supabase.co";
+const KEY="sb_publishable_aZiOzYpaik529lLoa_-C5Q_TKjs4iPk";
+const sb=window.supabase.createClient(URL,KEY);
+let user=null, mode="login";
+
+const $=id=>document.getElementById(id);
+function setMode(m){mode=m;$("lt").classList.toggle("active",m==="login");$("st").classList.toggle("active",m==="signup");$("authBtn").textContent=m==="login"?"Sign in":"Create account";$("authMsg").className="hidden";$("authMsg").textContent=""}
+$("lt").onclick=()=>setMode("login");$("st").onclick=()=>setMode("signup");
+
+function message(text,ok=false){$("authMsg").textContent=text;$("authMsg").className="msg "+(ok?"ok":"err")}
+$("authForm").onsubmit=async e=>{
+ e.preventDefault();$("authBtn").disabled=true;
+ try{
+  const email=$("email").value.trim(),password=$("password").value;
+  if(mode==="signup"){
+   const {data,error}=await sb.auth.signUp({email,password});
+   if(error)throw error;
+   if(data.session)showApp(data.user);else{message("Account created. Check your email to confirm your account.",true);$("authForm").reset()}
+  }else{
+   const {data,error}=await sb.auth.signInWithPassword({email,password});
+   if(error)throw error;showApp(data.user);
+  }
+ }catch(e){message(e.message||"Authentication failed")}finally{$("authBtn").disabled=false}
+};
+
+function showApp(u){user=u;$("profileEmail").textContent=u.email||"";$("auth").classList.add("hidden");$("app").classList.remove("hidden");loadStats()}
+function page(p){["home","docs","chat"].forEach(x=>$(x).classList.toggle("hidden",x!==p));["homeNav","docsNav","chatNav"].forEach(x=>$(x).classList.remove("active"));$(p+"Nav").classList.add("active");if(p==="docs")loadDocs()}
+$("homeNav").onclick=()=>page("home");$("docsNav").onclick=()=>page("docs");$("chatNav").onclick=()=>page("chat");$("addKnowledge").onclick=()=>page("docs");
+$("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};
+
+async function loadStats(){
+ const a=await sb.from("documents").select("*",{count:"exact",head:true}).eq("user_id",user.id);
+ const b=await sb.from("document_chunks").select("*",{count:"exact",head:true}).eq("user_id",user.id);
+ $("docCount").textContent=a.count??0;$("chunkCount").textContent=b.count??0;
+}
+function fmt(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(1)+" MB"}
+function splitText(t,size=1800,overlap=250){let out=[],s=0;while(s<t.length){let e=Math.min(t.length,s+size);out.push(t.slice(s,e));if(e===t.length)break;s=e-overlap}return out.filter(x=>x.trim())}
+async function extractPDF(file){
+ const pdfjs=await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+ pdfjs.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+ const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise,parts=[];
+ for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p),c=await page.getTextContent();parts.push(c.items.map(x=>x.str).join(" "))}
+ return parts.join("\\n\\n")
+}
+async function extract(file){if(file.type==="application/pdf"||/\\.pdf$/i.test(file.name))return extractPDF(file);return file.text()}
+
+$("fileInput").onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ $("uploadStatus").textContent="Reading document…";
+ try{
+  const text=await extract(file);if(!text.trim())throw new Error("No readable text found.");
+  const path=user.id+"/"+crypto.randomUUID()+"-"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  $("uploadStatus").textContent="Uploading…";
+  const up=await sb.storage.from("documents").upload(path,file,{upsert:false});if(up.error)throw up.error;
+  const ins=await sb.from("documents").insert({user_id:user.id,name:file.name,file_path:path,file_type:file.type||"text/plain",file_size:file.size}).select().single();if(ins.error)throw ins.error;
+  const parts=splitText(text).map((content,i)=>({document_id:ins.data.id,user_id:user.id,content,chunk_index:i}));
+  const ci=await sb.from("document_chunks").insert(parts);if(ci.error)throw ci.error;
+  $("uploadStatus").textContent="Uploaded successfully — "+parts.length+" chunks created.";
+  e.target.value="";loadDocs();loadStats();
+ }catch(err){$("uploadStatus").textContent="Upload failed: "+(err.message||err)}
+};
+async function loadDocs(){
+ const {data}=await sb.from("documents").select("*").eq("user_id",user.id).order("created_at",{ascending:false});
+ const box=$("docsList");box.innerHTML="";
+ if(!data?.length){box.innerHTML='<div class="card muted">No documents yet.</div>';return}
+ data.forEach(d=>{
+  const el=document.createElement("div");el.className="doc";
+  const left=document.createElement("div");left.style.minWidth="0";
+  const name=document.createElement("div");name.className="docname";name.textContent=d.name;
+  const meta=document.createElement("div");meta.className="docmeta";meta.textContent=(d.file_type||"file")+" · "+(d.file_size?fmt(d.file_size):"");
+  left.append(name,meta);const del=document.createElement("button");del.className="btn";del.textContent="Delete";del.onclick=()=>deleteDoc(d);el.append(left,del);box.appendChild(el)
+ })
+}
+async function deleteDoc(d){if(!confirm("Delete this document?"))return;await sb.storage.from("documents").remove([d.file_path]);await sb.from("documents").delete().eq("id",d.id).eq("user_id",user.id);loadDocs();loadStats()}
+
+function bubble(text,type){const d=document.createElement("div");d.className="bubble "+type;d.textContent=text;$("messages").appendChild(d);$("messages").scrollTop=$("messages").scrollHeight;return d}
+$("chatForm").onsubmit=async e=>{
+ e.preventDefault();const q=$("question").value.trim();if(!q)return;
+ if($("messages").querySelector(".muted"))$("messages").innerHTML="";
+ bubble(q,"user");$("question").value="";const pending=bubble("Thinking…","ai");
+ try{
+  const {data,error}=await sb.functions.invoke("ai-chat",{body:{question:q}});
+  if(error)throw error;
+  pending.textContent=data?.answer||data?.error||"No answer returned.";
+ }catch(err){pending.textContent="AI request failed. If the function says authentication is invalid, sign out and sign in again. If it says AI_API_KEY is not configured, check the Edge Function secret."}
+};
+
+sb.auth.getSession().then(({data})=>{if(data.session)showApp(data.session.user)});
+</script>
+</body>
+</html>
